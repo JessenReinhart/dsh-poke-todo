@@ -43,13 +43,13 @@ const MAX_CONSECUTIVE_POKES = 3
 /** Statuses jcode treats as "finished" for the incomplete-todo poke. */
 const FINISHED = new Set(['completed', 'cancelled', 'canceled'])
 
-/** sessionId -> { enabled, consecutive, lastPokedTurn } */
+/** sessionId -> { enabled, consecutive } */
 const sessions = new Map()
 
 function stateFor(sessionId) {
   let state = sessions.get(sessionId)
   if (!state) {
-    state = { enabled: true, consecutive: 0, lastPokedTurn: -1 }
+    state = { enabled: true, consecutive: 0 }
     sessions.set(sessionId, state)
   }
   return state
@@ -107,6 +107,12 @@ return {
       sessions.delete(agent.id)
     })
 
+    ctx.on('agent/inbox/claimed', ({ agent, message }) => {
+      if (!agent || !message || message.role !== 'user') return
+      if (message.source && message.source.kind === 'plugin' && message.source.plugin === SOURCE.plugin) return
+      stateFor(agent.id).consecutive = 0
+    })
+
     /*
      * Serial listener: the loop awaits every handler before it decides to
      * break out of the step cycle, so a steer() performed here is visible to
@@ -117,7 +123,6 @@ return {
 
       const state = stateFor(agent.id)
       if (!state.enabled) return
-      if (state.lastPokedTurn === turn) return
       if (state.consecutive >= MAX_CONSECUTIVE_POKES) return
 
       const todos = projections.stateOf(agent.session, 'todos')
@@ -129,7 +134,6 @@ return {
         return
       }
 
-      state.lastPokedTurn = turn
       state.consecutive += 1
       agent.steer(pokeMessage(text))
       console.log(`poke ${state.consecutive}/${MAX_CONSECUTIVE_POKES} for session ${agent.id}: ${text}`)

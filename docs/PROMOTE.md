@@ -1,25 +1,37 @@
-# Promoting to Permanent Plugin Installation
+# Permanent Profile Installation
 
-Dynamic Cordis plugins loaded through `cordis_define` reside in `DynamicCordisRegistry` in-memory structures and do not persist across process restarts unless installed as static profile plugins or promoted.
+Dynamic plugins loaded through `cordis_define` live in the running process and do not survive a DSH restart. This repository also ships a static Cordis module and `dsh.bundle.patch` profile layer.
 
-## 1. Profile Staging & Bundle Patch
+## Install the desktop profile
 
-DSH supports static plugin loading via desktop and web profile compositions:
+From the repository root:
 
-1. Place the static module under the user profile directory:
-   ```text
-   %USERPROFILE%\.dsh\profiles\desktop\node_modules\cordis-poke-todo
-   ```
-2. Include a `cordis.patch.yml` file defining the bundle layer injection:
-   ```yaml
-   - insert:
-       - id: poke-todo
-         name: 'cordis-poke-todo'
-   ```
-3. Export an `apply(ctx)` plugin function conforming to Cordis specifications.
+```powershell
+node scripts/install.mjs --profile desktop --from local
+```
 
-## 2. Re-Activation Fallback
+The installer runs `pnpm add link:<repository>`, verifies that the installed package declares `dsh.bundle.patch`, and appends `cordis-poke-todo` to `%USERPROFILE%\.dsh\profiles\desktop\package.json` under `dsh.profile.bundles`. The resulting profile dependency is visible with:
 
-If running purely dynamic instances without profile modifications:
-- Run `node scripts/define-payload.mjs` on startup.
-- Use `cordis_define` and `cordis_run` to restore the plugin state.
+```powershell
+dsh plugin --profile desktop list
+```
+
+The tested result is a 20-package profile containing `cordis-poke-todo@link:../../../../../tmp/cordis-poke-todo` and a `dsh.profile.bundles` entry named `cordis-poke-todo`.
+
+## Static package shape
+
+- `lib/index.js` exports the Cordis `name`, `inject`, and `apply` contract.
+- `cordis.patch.yml` inserts the `poke-todo` row into the composed bundle.
+- No dynamic `harness.handle` or client approval is needed for the static profile module.
+
+Reload DSH Desktop (Ctrl+R/F5) or restart it to load the newly composed profile. The running session used during development remains on the dynamic package until restart.
+
+## Dynamic fallback
+
+If profile installation is unavailable, regenerate the dynamic payload and re-run it:
+
+```powershell
+node scripts/define-payload.mjs
+```
+
+Call `cordis_define`, then `cordis_run` with the returned `pluginId` and `packageId`. Dynamic registrations require approval when a client half is present and remain process-local.

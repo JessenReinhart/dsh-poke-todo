@@ -1,43 +1,36 @@
 # Cordis Poke Todo
 
-A dynamic Cordis Plugin for DeepSeek Harness that ports jcode's **auto-poke** behavior.
+A Cordis Plugin for DeepSeek Harness that ports jcode's **auto-poke** behavior. Supports both dynamic in-session installation (`cordis_define`) and permanent DSH desktop profile installation via `cordis.patch.yml`.
 
-When an agent is about to stop a turn and its session still has unfinished todos, the Host half injects a synthetic user continuation:
+When an agent is about to finish a turn while its session still holds incomplete todos, the Host half injects a synthetic continuation:
 
 > You have N incomplete todo(s). Continue working, or update the todo tool.
 
-The plugin uses the DSH `agent/turn-stopping` serial event, the `sessionProjections` todo projection, and `agent.steer()` to continue the current turn. It stops after three consecutive pokes per session and resets its budget when no incomplete todo remains.
+The plugin listens to the DSH `agent/turn-stopping` serial event, queries the session's current todo projection from `sessionProjections`, and issues `agent.steer()` to continue the turn without dropping into an idle state.
 
-## Source
+## Architecture & Layout
 
-- `plugin/host.js`: plain JavaScript function body for `code.host`.
-- `plugin/client.js`: plain JavaScript function body for `code.client`.
-- `manifest.json`: runtime IDs and package metadata after installation.
+- `lib/index.js`: static ES module export conforming to Cordis plugin conventions (`name`, `inject`, `apply`).
+- `plugin/host.js`: dynamic host function body for runtime installation via `cordis_define`.
+- `plugin/client.js`: client-side RPC bridge and styles for dynamic runtime installation.
+- `cordis.patch.yml`: permanent bundle layer patch for DSH profile compositions.
+- `scripts/install.mjs`: profile installer script (`node scripts/install.mjs --profile desktop`).
+- `scripts/define-payload.mjs`: CLI helper emitting the dynamic `cordis_define` JSON payload.
+- `test/host.test.mjs`: 8 unit tests for dynamic host sandbox execution.
+- `test/static.test.mjs`: 7 unit tests for static module exports and lifecycle hooks.
+- `docs/`: in-depth technical analysis and step-by-step guides.
+  - `docs/jcode-analysis.md`: complete breakdown of jcode's auto-poke semantics.
+  - `docs/INSTALL.md`: guide for runtime dynamic activation (`cordis_define` + `cordis_run`).
+  - `docs/PROMOTE.md`: guide for permanent profile registration.
 
-## Install in the current DSH runtime
+## Current Installation State
 
-The package was defined and activated as:
+1. **Active Dynamic Plugin**: running in the live DSH runtime as `poke-1/pkg-2` (run: `run-2`).
+2. **Permanent Static Installation**: linked to `C:\Users\LGSM228\.dsh\profiles\desktop\node_modules\cordis-poke-todo` and registered in `dsh.profile.bundles`. Survives desktop reloads.
 
-- Plugin: `poke-1`
-- Package: `pkg-1`
-- Run: `run-1`
+## Safety & Semantics
 
-Dynamic Cordis plugins are in-memory. A process restart requires re-activation unless promoted through DSH's desktop dynamic-plugin promotion workflow.
-
-## jcode behavior mapped
-
-- `crates/jcode-base/src/todo.rs:648-653`: exact incomplete-todo message.
-- `src/cli/commands.rs:2774-2813`: incomplete todos take precedence over later validation branches.
-- `crates/jcode-tui/src/tui/app/commands.rs:66-73`: `/poke`, `/poke on`, `/poke off`, `/poke status` command surface.
-- DSH `@deepseek-ai/dsh-agent-loop/lib/index.js:966-974`: serial turn-stopping hook and next-step recheck.
-- DSH `@deepseek-ai/dsh-agent-loop/lib/index.js:789-797`: `steer()` sends to `next-step` and wakes the driver.
-- DSH `@deepseek-ai/dsh-tool-todo/lib/index.js`: todo projection under `sessionProjections.stateOf(session, "todos")`.
-
-## Safety
-
-- Only `pending` and `in_progress` todos trigger a poke.
-- `completed`, `cancelled`, and `canceled` are treated as finished.
-- A signal that is already aborted is ignored.
-- Duplicate processing of the same turn is ignored.
-- Three consecutive pokes are the circuit breaker.
-- No dynamic model-visible Tool is registered; the feature is lifecycle-driven and does not need the model to call another tool.
+- Tracks up to 3 consecutive pokes per session as a circuit breaker (`MAX_CONSECUTIVE_POKES = 3`).
+- Pokes reset whenever a genuine human message is claimed (`agent/inbox/claimed`).
+- Synonyms `cancelled` and `canceled` are treated as finished alongside `completed`.
+- Aborted turns (`signal.aborted`) are safely ignored.
