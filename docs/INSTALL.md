@@ -1,6 +1,6 @@
-# Installing cordis-poke-todo into DeepSeek Harness
+# Installing dsh-poke-todo into DeepSeek Harness
 
-This guide describes how to install and manage the `cordis-poke-todo` dynamic Cordis plugin in DeepSeek Harness.
+This guide describes how to install and manage the `dsh-poke-todo` dynamic Cordis plugin in DeepSeek Harness.
 
 ## Dynamic Plugin Installation
 

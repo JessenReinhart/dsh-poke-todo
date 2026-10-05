@@ -10,13 +10,13 @@ From the repository root:
 node scripts/install.mjs --profile desktop --from local
 ```
 
-The installer runs `pnpm add link:<repository>`, verifies that the installed package declares `dsh.bundle.patch`, and appends `cordis-poke-todo` to `%USERPROFILE%\.dsh\profiles\desktop\package.json` under `dsh.profile.bundles`. The resulting profile dependency is visible with:
+The installer runs `pnpm add link:<repository>`, verifies that the installed package declares `dsh.bundle.patch`, and appends `dsh-poke-todo` to the profile manifest (`%USERPROFILE%\.dsh\profiles\<name>\package.json`) under `dsh.profile.bundles`. The resulting profile dependency is visible with:
 
 ```powershell
 dsh plugin --profile desktop list
 ```
 
-The tested result is a 20-package profile containing `cordis-poke-todo@link:../../../../../tmp/cordis-poke-todo` and a `dsh.profile.bundles` entry named `cordis-poke-todo`.
+The profile then lists `dsh-poke-todo` as a linked or registry dependency alongside a matching `dsh.profile.bundles` entry.
 
 ## Static package shape
 

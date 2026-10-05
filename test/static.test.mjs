@@ -55,7 +55,7 @@ function createAgent(id, session = id) {
 }
 
 test('static plugin exports Cordis contract', () => {
-  assert.equal(name, 'cordis-poke-todo')
+  assert.equal(name, 'dsh-poke-todo')
   assert.deepEqual(inject, ['sessionProjections'])
   assert.equal(typeof apply, 'function')
   assert.equal(plugin.name, name)
@@ -83,7 +83,7 @@ test('pokes agent with valid frozen user message on turn-stopping when todos inc
   assert.equal(msg.role, 'user')
   assert.ok(msg.id && typeof msg.id === 'string' && msg.id.length > 0)
   assert.equal(msg.source?.kind, 'plugin')
-  assert.equal(msg.source?.plugin, 'cordis-poke-todo')
+  assert.equal(msg.source?.plugin, 'dsh-poke-todo')
   assert.equal(msg.content[0].text, 'You have 1 incomplete todo. Continue working, or update the todo tool.')
 })
 
@@ -106,7 +106,7 @@ test('budget resets on new human user request', async () => {
   // Synthetic poke message in inbox does NOT reset budget
   await harness.emit('agent/inbox/claimed', {
     agent,
-    message: { role: 'user', source: { kind: 'plugin', plugin: 'cordis-poke-todo' } },
+    message: { role: 'user', source: { kind: 'plugin', plugin: 'dsh-poke-todo' } },
   })
   await harness.emit('agent/turn-stopping', { agent, turn: 4, signal: { aborted: false } })
   assert.equal(agent.steered.length, 3)

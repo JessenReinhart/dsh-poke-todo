@@ -1,7 +1,7 @@
 {
-  "name": "cordis-poke-todo",
+  "name": "dsh-poke-todo",
   "version": "2.0.0",
-  "description": "Static Cordis plugin that ports jcode's auto-poke todo behavior to DeepSeek Harness.",
+  "description": "DeepSeek Harness Cordis plugin porting jcode's auto-poke incomplete-todos feature.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -33,13 +33,13 @@
     "payload": "node scripts/define-payload.mjs",
     "install:profile": "node scripts/install.mjs"
   },
-  "keywords": ["cordis", "deepseek-harness", "dsh", "plugin", "jcode", "auto-poke", "todo"],
+  "keywords": ["cordis", "deepseek-harness", "dsh", "dsh-plugin", "plugin", "jcode", "auto-poke", "todo"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JessenReinhart/cordis-poke-todo.git"
+    "url": "git+https://github.com/JessenReinhart/dsh-poke-todo.git"
   },
-  "bugs": { "url": "https://github.com/JessenReinhart/cordis-poke-todo/issues" },
-  "homepage": "https://github.com/JessenReinhart/cordis-poke-todo#readme",
+  "bugs": { "url": "https://github.com/JessenReinhart/dsh-poke-todo/issues" },
+  "homepage": "https://github.com/JessenReinhart/dsh-poke-todo#readme",
   "license": "MIT",
   "engines": { "node": ">=20" }
 }

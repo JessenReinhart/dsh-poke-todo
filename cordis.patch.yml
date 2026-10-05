@@ -1,4 +1,4 @@
-# Bundle patch for cordis-poke-todo
+# Bundle patch for dsh-poke-todo
 - insert:
     - id: poke-todo
-      name: 'cordis-poke-todo'
+      name: 'dsh-poke-todo'

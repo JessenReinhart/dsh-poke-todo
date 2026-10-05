@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Install cordis-poke-todo into a DSH profile on this machine.
+ * Install dsh-poke-todo into a DSH profile on this machine.
  *
  * Usage:
  *   node scripts/install.mjs [--profile <name>] [--from local|github]
@@ -9,7 +9,7 @@
  * Defaults: --profile desktop --from local (the repository this script lives in).
  *
  * The script runs `pnpm add <spec>` inside the profile directory and then
- * appends `cordis-poke-todo` to `dsh.profile.bundles` in the profile manifest —
+ * appends `dsh-poke-todo` to `dsh.profile.bundles` in the profile manifest —
  * the same registration `dsh plugin add` performs when pnpm exits 0. Unlike the
  * bare `dsh plugin` command it also works for profiles the CLI guards, and it
  * verifies the installed package actually declares `dsh.bundle.patch`.
@@ -20,8 +20,8 @@ import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const PACKAGE_NAME = 'cordis-poke-todo'
-const GITHUB_REPO = 'JessenReinhart/cordis-poke-todo'
+const PACKAGE_NAME = 'dsh-poke-todo'
+const GITHUB_REPO = 'JessenReinhart/dsh-poke-todo'
 const WIN = process.platform === 'win32'
 const PACKAGE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 

@@ -1,16 +1,13 @@
 {
-  "name": "cordis-poke-todo",
+  "name": "dsh-poke-todo",
   "version": "2.0.0",
   "description": "Port of jcode's auto-poke todo feature to a dynamic and static Cordis Plugin for DeepSeek Harness.",
   "plugin": {
-    "kind": "existing",
-    "idPrefix": "poke",
-    "installedPluginId": "poke-1",
-    "currentPackageId": "pkg-2",
-    "currentRunId": "run-2"
+    "kind": "new",
+    "idPrefix": "poke"
   },
   "package": {
-    "name": "jcode poke todo",
+    "name": "dsh-poke-todo",
     "purpose": "Nudge an idle agent to continue working when its session has incomplete todos."
   },
   "files": {
